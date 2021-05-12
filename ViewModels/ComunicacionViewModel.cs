@@ -40,6 +40,12 @@ namespace RS232.ViewModels
             this.Ajustes = new AjustesViewModel();
             this.Puerto.DataReceived += DataReceived;
             this.Mensajes = new ObservableCollection<Mensaje>();
+            CargarMensajes();
+        }
+
+        private void CargarMensajes()
+        {
+            this.Mensajes.AddRange(LiteConnection.GetConnection().Table<Mensaje>().ToList());
         }
 
         private void DataReceived(object sender, SerialDataReceivedEventArgs e)
@@ -66,6 +72,7 @@ namespace RS232.ViewModels
                         Entrante = true,
                         Time = DateTime.Now.TimeOfDay
                     };
+                    mensaje.Save();
                     Action<Mensaje> addMethod = this.Mensajes.Add;
                     await App.Current.Dispatcher.BeginInvoke(addMethod, mensaje);
                 }
@@ -81,10 +88,11 @@ namespace RS232.ViewModels
         {
             try
             {
-                //write line to serial port
                 Puerto.WriteLine(Texto);
-                //clear the text box
-                this.Mensajes.Add(new Mensaje(){ Texto = Texto,Entrante = false,Time = DateTime.Now.TimeOfDay});
+
+                var mensaje = new Mensaje() {Texto = Texto, Entrante = false, Time = DateTime.Now.TimeOfDay};
+                this.Mensajes.Add(mensaje);
+                mensaje.Save();
                 Texto = string.Empty;
             }
             catch (System.Exception ex)

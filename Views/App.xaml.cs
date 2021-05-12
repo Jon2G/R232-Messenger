@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using RS232.Models;
 
 namespace RS232.Views
 {
@@ -11,6 +12,7 @@ namespace RS232.Views
         {
             base.OnStartup(e);
             Kit.WPF.Tools.Init();
+            LiteConnection.GetConnection().CheckTables(typeof(Mensaje));
         }
     }
 }
